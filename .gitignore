@@ -1,0 +1,17 @@
+# build directories
+build/
+build-*/
+
+# Python
+.venv/
+__pycache__/
+
+
+# plots written next to the CSVs by plot_results.py
+# (the figures used by the report are kept in docs/figures/)
+results/*.png
+
+# editors and OS
+.vscode/
+.idea/
+.DS_Store
