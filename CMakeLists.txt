@@ -15,14 +15,17 @@ if(NOT NTL_LIB)
     message(FATAL_ERROR "NTL not found")
 endif()
 
+find_package(OpenSSL REQUIRED)   # defines the target OpenSSL::Crypto
+
 # --- library: everything except the file that contains main() ---
 add_library(bike_lib STATIC
     src/utils.cpp
     src/random_bike.cpp
     src/decoder.cpp
+    src/crypto_rng.cpp
 )
 target_include_directories(bike_lib PUBLIC ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(bike_lib PUBLIC ${NTL_LIB} gmp pthread m)
+target_link_libraries(bike_lib PUBLIC ${NTL_LIB} gmp pthread m OpenSSL::Crypto)
 target_compile_options(bike_lib PUBLIC -Wall -Wextra)
 
 # --- main executable ---
@@ -49,5 +52,4 @@ function(add_unit_test name)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
-# add them as the files appear, e.g.:
-# add_unit_test(test_consistency)
+add_unit_test(test_crypto_rng)

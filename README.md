@@ -13,8 +13,9 @@ BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.
 | Bit-flip decoder (fixed or variable threshold) | done |
 | Black-Gray-Flip (BGF) decoder | done |
 | Experiment harness and decoder comparison | done ([report](docs/report.md)) |
+| Randomness and hashing (OpenSSL) | done
 | KeyGen / Encaps / Decaps | planned |
-| Unit tests, timing-leakage check with dudect | planned |
+| Unit tests, timing-leakage check with dudect | partial |
 | Own GF(2)[X] arithmetic (replacing NTL) | planned |
 
 > This implementation is not constant-time, not bit-exact with the
@@ -49,17 +50,25 @@ reproduction steps are in [docs/report.md](docs/report.md).
   BGF with 5 iterations and black/gray masked steps.
 - **Evaluation.** All decoders are run on identical random samples. Cost is counted
   in counters computed, so the comparison does not depend on the machine or on NTL.
+- **Randomness and hashing (OpenSSL).** Secrets (σ, the message m and the key
+  generation seed) come from OpenSSL's CSPRNG (`RAND_priv_bytes`). The functions
+  H, L and K are instantiated with SHAKE256 (OpenSSL's `EVP` interface) and a
+  one-byte domain-separation tag. A deterministic stream `SHAKE256(tag ‖ seed)`
+  feeds the fixed-weight sampler used for H(m) and for expanding the key generation
+  seed, so decapsulation can re-derive the error exactly. `mt19937` is only used in
+  `experiments/`, to keep the decoder comparisons reproducible, and never for keys.
+  The sampler (Fisher-Yates with rejection sampling) is not constant-time.
 
 
 ## Installation
 
 ### Build
 
-Requirements: a C++17 compiler, CMake ≥ 3.10, [NTL](https://libntl.org/) and GMP.
+Requirements: a C++17 compiler, CMake ≥ 3.10, [NTL](https://libntl.org/), GMP and openSSL.
 
 ```bash
 # Debian / Ubuntu / Linux Mint
-sudo apt install build-essential cmake libntl-dev libgmp-dev
+sudo apt install build-essential cmake libntl-dev libgmp-dev libssl-dev
 
 git clone <repo-url>
 cd BIKE_timing
@@ -110,6 +119,7 @@ BIKE_timing/
 │   ├── harness.cpp
 │   └── harness.h
 ├── include/
+│   ├── crypto_rng.h        # os rng, hash functions, etc (openSSL)
 │   ├── decoder.h           # bit_flip, bgf_decoder, threshold functions
 │   ├── random_bike.h
 │   └── utils.h             # GF2E_bike, Support, hamming_weight
@@ -122,10 +132,12 @@ BIKE_timing/
 │   └── plot_results.py     # CSV -> PNG
 ├── src/
 │   ├── BIKE.cpp            #   main()
+│   ├── crypto_rng.cpp 
 │   ├── decoder.cpp
 │   ├── random_bike.cpp
 │   └── utils.cpp
 ├── tests/                  # unit tests, run with ctest
+│   ├── test_crypto_rng.cpp 
 ├── .gitignore
 ├── CMakeLists.txt
 ├── LICENSE

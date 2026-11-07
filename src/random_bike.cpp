@@ -10,12 +10,11 @@ int randint(int n){
 }
 
 // returns a uniform rand list of t different integers between 0 and n-1
+// (not constant time)
 std::vector<int> fisher_yates(int n, int t){
     // init [0, 1, 2, ..., n-1]
     std::vector<int> wlist(n);
-    for(int i = 0; i < n; i++){
-        wlist[i] = i;
-    }
+    for(int i = 0; i < n; i++) wlist[i] = i;
 
     for(int i = 0; i < t; i++){
         int pos = i + randint(n - i);
