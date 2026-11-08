@@ -55,3 +55,4 @@ endfunction()
 
 add_unit_test(test_crypto_rng)
 add_unit_test(test_kem)
+add_unit_test(test_utils)

@@ -73,7 +73,7 @@ Requirements: a C++17 compiler, CMake ≥ 3.10, [NTL](https://libntl.org/), GMP 
 # Debian / Ubuntu / Linux Mint
 sudo apt install build-essential cmake libntl-dev libgmp-dev libssl-dev
 
-git clone <repo-url>
+git clone https://github.com/Synthettikk/BIKE_timing
 cd BIKE_timing
 
 cmake -S . -B build        # configure (creates build/, Release mode by default)
@@ -147,6 +147,7 @@ BIKE_timing/
 ├── tests/                  # unit tests, run with ctest
 │   ├── test_crypto_rng.cpp 
 │   ├── test_kem.cpp 
+│   └── test_tils.cpp
 ├── .gitignore
 ├── CMakeLists.txt
 ├── LICENSE
