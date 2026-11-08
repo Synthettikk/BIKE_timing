@@ -1,6 +1,6 @@
 # BIKE Implementation and Timing Leaks
 
-[![CI](https://https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml/badge.svg)](https://https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml)
+[![CI](https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml/badge.svg)](https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml)
 
 This project aims to implement the BIKE cryptosystem (based on the Bit-Flipping algorithm) without constant time and show that a timing leak appears, using dudect. We also compare the Bit-Flipping algorithm and the Black-Gray-Flip decoder. 
 
