@@ -23,6 +23,7 @@ add_library(bike_lib STATIC
     src/random_bike.cpp
     src/decoder.cpp
     src/crypto_rng.cpp
+    src/kem.cpp
 )
 target_include_directories(bike_lib PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(bike_lib PUBLIC ${NTL_LIB} gmp pthread m OpenSSL::Crypto)
@@ -53,3 +54,4 @@ function(add_unit_test name)
 endfunction()
 
 add_unit_test(test_crypto_rng)
+add_unit_test(test_kem)

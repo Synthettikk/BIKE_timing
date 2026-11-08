@@ -54,6 +54,24 @@ std::vector<int> GF2E_bike::to_bits(const GF2E& v) {
     return bits;
 }
 
+std::vector<uint8_t> GF2E_bike::to_bytes(const GF2E& a) {
+    const GF2X& p = rep(a);
+    std::vector<uint8_t> out(static_cast<size_t>((r + 7) / 8), 0);
+    for (int i = 0; i <= deg(p); i++)          // deg(0) = -1: the loop does nothing
+        if (IsOne(coeff(p, i)))
+            out[i / 8] |= static_cast<uint8_t>(1u << (i % 8));
+    return out;
+}
+
+GF2E GF2E_bike::from_bytes(const std::vector<uint8_t>& b) {
+    assert(b.size() == static_cast<size_t>((r + 7) / 8));
+    GF2X p;
+    for (int i = 0; i < r; i++)
+        if ((b[i / 8] >> (i % 8)) & 1)
+            SetCoeff(p, i);
+    return to_GF2E(p);
+}
+
 GF2 GF2E_bike::coef_poly(GF2E v, int i) {
     return coeff(rep(v), i);
 }

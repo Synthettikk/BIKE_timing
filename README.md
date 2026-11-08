@@ -14,12 +14,13 @@ BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.
 | Black-Gray-Flip (BGF) decoder | done |
 | Experiment harness and decoder comparison | done ([report](docs/report.md)) |
 | Randomness and hashing (OpenSSL) | done
-| KeyGen / Encaps / Decaps | planned |
+| KeyGen / Encaps / Decaps | done |
 | Unit tests, timing-leakage check with dudect | partial |
 | Own GF(2)[X] arithmetic (replacing NTL) | planned |
 
 > This implementation is not constant-time, not bit-exact with the
-> BIKE specification (no KAT), and must not be used to protect real data.
+> BIKE specification (no KAT), does not properly clear the secrets from the
+> memory and must not be used to protect real data.
 
 
 ## Results 
@@ -121,6 +122,7 @@ BIKE_timing/
 ├── include/
 │   ├── crypto_rng.h        # os rng, hash functions, etc (openSSL)
 │   ├── decoder.h           # bit_flip, bgf_decoder, threshold functions
+│   ├── kem.h               # Keygen, Encaps, Decaps
 │   ├── random_bike.h
 │   └── utils.h             # GF2E_bike, Support, hamming_weight
 ├── results/                # raw CSV behind the report
@@ -134,10 +136,12 @@ BIKE_timing/
 │   ├── BIKE.cpp            #   main()
 │   ├── crypto_rng.cpp 
 │   ├── decoder.cpp
+│   ├── kem.cpp             
 │   ├── random_bike.cpp
 │   └── utils.cpp
 ├── tests/                  # unit tests, run with ctest
 │   ├── test_crypto_rng.cpp 
+│   ├── test_kem.cpp 
 ├── .gitignore
 ├── CMakeLists.txt
 ├── LICENSE

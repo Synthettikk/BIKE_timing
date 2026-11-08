@@ -22,7 +22,17 @@ private:
     static NTL::GF2E from_bits(const std::vector<int>& bit_vec);
     
 public:
+    bool is_zero() const { return NTL::IsZero(v0) && NTL::IsZero(v1); }
+    bool operator==(const GF2E_bike& o) const { return v0 == o.v0 && v1 == o.v1; } // not CT
+    bool operator!=(const GF2E_bike& o) const { return !(*this == o); }
+
     static std::vector<int> to_bits(const NTL::GF2E& v);
+
+    // Polynomial <-> bytes (ceil(r/8) bytes). The coefficient of X^i is bit (i % 8)
+    // of byte i / 8; the padding bits of the last byte are 0.
+    static std::vector<uint8_t> to_bytes(const NTL::GF2E& a);
+    static NTL::GF2E from_bytes(const std::vector<uint8_t>& b);
+
     const NTL::GF2E& block(int b) const { return b == 0 ? v0 : v1; }
     GF2E_bike(); // default is 0
     GF2E_bike(const std::vector<int>& v0_pos, const std::vector<int>& v1_pos); 
