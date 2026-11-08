@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml/badge.svg)](https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml)
 
-This project aims to implement the BIKE cryptosystem (based on the Bit-Flipping algorithm) without constant time and show that a timing leak appears, using dudect. We also compare the Bit-Flipping algorithm and the Black-Gray-Flip decoder. 
+This project aims to implement the BIKE cryptosystem without constant time and to demonstrate the occurrence of a timing leak using dudect.
+BIKE is a postquantum code-based cryptostem that made it to the round 4 of the NIST standardization competition. 
+We also compare the Bit-Flipping algorithm and the Black-Gray-Flip decoder, and report an inventory of non constant functions that manipulate the secret. 
 
 The documentation we used can be found here : 
 BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.1.pdf> (threshold function, BGF parameters).
@@ -17,7 +19,8 @@ BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.
 | Experiment harness and decoder comparison | done ([report](docs/report.md)) |
 | Randomness and hashing (OpenSSL) | done
 | KeyGen / Encaps / Decaps | done |
-| Unit tests, timing-leakage check with dudect | partial |
+| Unit tests | done |
+| Timing-leakage check with dudect | planned |
 | Own GF(2)[X] arithmetic (replacing NTL) | planned |
 
 > This implementation is not constant-time, not bit-exact with the
@@ -43,7 +46,7 @@ reproduction steps are in [docs/report.md](docs/report.md).
 
 - **Representation.** A vector of length 2r is a pair $(v0, v1)$ of elements of
   $\mathbb{F}_2[X]/(X^r − 1)$, stored as NTL `GF2E`. The syndrome of an error $e$ is
-  $s = e0·h0 + e1·h1$, with $h0, h1$ the first columns of the circulant blocks of $H$.
+  $s = e_0·h_0 + e_1·h_1$, with $h_0, h_1$ the first columns of the circulant blocks of $H$.
 - **Counters.** The number of unsatisfied checks of position j is a cyclic
   correlation between the support of $h$ (71 ones) and the syndrome, computed over
   the integers. Using the sparse support costs about w·r operations per pass,
@@ -146,6 +149,7 @@ BIKE_timing/
 │   └── utils.cpp
 ├── tests/                  # unit tests, run with ctest
 │   ├── test_crypto_rng.cpp 
+│   ├── test_decoder.cpp 
 │   ├── test_kem.cpp 
 │   └── test_tils.cpp
 ├── .gitignore
@@ -153,9 +157,3 @@ BIKE_timing/
 ├── LICENSE
 └── README.md
 ```
-
-
-
-
-
-

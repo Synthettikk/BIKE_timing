@@ -17,7 +17,7 @@ struct DecodeStats {
     int  final_syndrome_weight = 0;
 };
 
-// Threshold of BIKE level 1: T = max(ceil(c0*|s| + c1), t_min).
+// Threshold of BIKE level 1: T = max(floor(c0*|s| + c1), t_min).
 // The constants depend on (r, w, t)
 int threshold_bike(int s_weight, double c0 = 0.0069722, double c1 = 13.530, int t_min = 36);
 
@@ -43,15 +43,21 @@ static inline int counter_at(const Support& supp, const std::vector<int>& s_bits
 GF2E_bike bit_flip(const NTL::GF2E& s, GF2E_bike e, const Support& supp, int T,
                    DecodeStats* st = nullptr);
 
+struct DecodeResult {
+    GF2E_bike e;      // last estimate of the error: valid only if success is true
+    bool success;     // true iff H*e = s (final syndrome is zero)
+};
+
 // variable threshold: T recomputed at each iteration from |s|
-GF2E_bike decoder(const NTL::GF2E& s, const GF2E_bike& H, int N,
-                  const ThresholdFn& thr, DecodeStats* st = nullptr);
+DecodeResult decoder(const NTL::GF2E& s, const GF2E_bike& H, int N,
+                     const ThresholdFn& thr, DecodeStats* st = nullptr);
 
 // fixed threshold (reference)
-GF2E_bike decoder(const NTL::GF2E& s, const GF2E_bike& H, int N,
-                  int T = 39, DecodeStats* st = nullptr);
+DecodeResult decoder(const NTL::GF2E& s, const GF2E_bike& H, int N,
+                     int T = 39, DecodeStats* st = nullptr);
 
-GF2E_bike bgf_decoder(const NTL::GF2E& s, const GF2E_bike& H, int NbIter,
-                      const ThresholdFn& thr, int tau = 3, DecodeStats* st = nullptr);
+DecodeResult bgf_decoder(const NTL::GF2E& s, const GF2E_bike& H, int NbIter,
+                         const ThresholdFn& thr, int tau = 3, DecodeStats* st = nullptr);
+
 
 #endif

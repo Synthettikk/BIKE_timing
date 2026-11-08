@@ -12,7 +12,7 @@ int main() {
         std::vector<NamedDecoder> decs;
         decs.push_back({"bgf_5it",
             [=](const NTL::GF2E& s, const GF2E_bike& H, DecodeStats& st) {
-                return bgf_decoder(s, H, NB_ITER, thr, TAU, &st);
+                return bgf_decoder(s, H, NB_ITER, thr, TAU, &st).e;
             }});
         Config cfg{R, W_HALF, t, TRIALS, 1234};
         write_csv_rows(std::cout, cfg, run_experiment(cfg, decs));

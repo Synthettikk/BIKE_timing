@@ -54,7 +54,8 @@ Bytes hash_K(const Bytes& key_material, const Ciphertext& ct) {
 } // namespace
  
 // ---- KeyGen ----------------------------------------------------------------
- 
+
+// does not filter weak keys
 KeyPair keygen_internal(const Params& P, const Bytes& seed) {
     assert(seed.size() == ELL_BYTES);
     assert(GF2E::degree() == P.r);   // init_gf2e(P.r) must have been called
@@ -113,13 +114,13 @@ SharedSecret decaps(const Params& P, const SecretKey& sk, const Ciphertext& ct) 
  
     // decoder: it returns the zero vector on failure, and a valid error has weight t > 0
     ThresholdFn thr = [](int sw) { return threshold_bike(sw); };
-    GF2E_bike e_dec = bgf_decoder(s, sk.H, NB_ITER, thr, TAU);
+    DecodeResult dec = bgf_decoder(s, sk.H, NB_ITER, thr, TAU);
  
-    bool ok = !e_dec.is_zero();
+    bool ok = dec.success;
     Bytes m_dec;
     if (ok) {
-        m_dec = xor_bytes(ct.c1, hash_L(e_dec));   // m' = c1 xor L(e')
-        ok = (hash_H(P, m_dec) == e_dec);  // does H(m') give back e' ?
+        m_dec = xor_bytes(ct.c1, hash_L(dec.e));   // m' = c1 xor L(e')
+        ok = (hash_H(P, m_dec) == dec.e);  // does H(m') give back e' ?
     }
 
     // implicit rejection: on any failure the key is derived from sigma instead of m'

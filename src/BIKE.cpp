@@ -59,7 +59,7 @@ static void test_decoding(int r0, int w, int t, int N) {
     GF2E_bike e(fisher_yates(r0, w), fisher_yates(r0, w));
 
     GF2E s = H.mult(e);
-    GF2E_bike e_dec = decoder(s, H, N);
+    GF2E_bike e_dec = decoder(s, H, N).e;
 
     bool ok = (e_dec.support() == e.support());
     std::cout << "decoding (r = " << r0 << ", t = " << t << "): "

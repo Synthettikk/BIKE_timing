@@ -51,7 +51,7 @@ GF2E_bike bit_flip(const GF2E& s, GF2E_bike e, const Support& supp, int T, Decod
 }
 
 // DECODER bit-flip classic
-GF2E_bike decoder(const GF2E& s, const GF2E_bike& H, int N,
+DecodeResult decoder(const GF2E& s, const GF2E_bike& H, int N,
                   const ThresholdFn& thr, DecodeStats* st){
     Support supp_H = H.support();
     GF2E_bike e;
@@ -67,11 +67,10 @@ GF2E_bike decoder(const GF2E& s, const GF2E_bike& H, int N,
         }
     }
     if (st) st->final_syndrome_weight = weight(s2);
-    if (IsZero(s2)) return e;
-    return GF2E_bike();
+    return {e, IsZero(s2) != 0};
 }
 
-GF2E_bike decoder(const GF2E& s, const GF2E_bike& H, int N, int T, DecodeStats* st){
+DecodeResult decoder(const GF2E& s, const GF2E_bike& H, int N, int T, DecodeStats* st){
     return decoder(s, H, N, ThresholdFn([T](int){ return T; }), st);
 }
 
@@ -88,7 +87,7 @@ static GF2E_bike masked_iter(const GF2E& sigma, GF2E_bike e, const Support& supp
     return e;
 }
 
-GF2E_bike bgf_decoder(const GF2E& s, const GF2E_bike& H, int NbIter,
+DecodeResult bgf_decoder(const GF2E& s, const GF2E_bike& H, int NbIter,
                       const ThresholdFn& thr, int tau, DecodeStats* st){
     Support supp = H.support();
     const int d = (int)supp[0].size();           // w/2
@@ -122,6 +121,5 @@ GF2E_bike bgf_decoder(const GF2E& s, const GF2E_bike& H, int NbIter,
         }
     }
     if (st) st->final_syndrome_weight = weight(sigma);
-    if (IsZero(sigma)) return e;
-    return GF2E_bike();
+    return {e, IsZero(sigma) != 0};
 }

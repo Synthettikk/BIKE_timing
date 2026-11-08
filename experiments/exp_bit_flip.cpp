@@ -15,11 +15,11 @@ int main() {
         for (int T : Ts)
             decs.push_back({"bitflip_T" + std::to_string(T),
                 [=](const NTL::GF2E& s, const GF2E_bike& H, DecodeStats& st) {
-                    return decoder(s, H, N, T, &st);
+                    return decoder(s, H, N, T, &st).e;
                 }});
         decs.push_back({"bitflip_var",
             [=](const NTL::GF2E& s, const GF2E_bike& H, DecodeStats& st) {
-                return decoder(s, H, N, thr, &st);
+                return decoder(s, H, N, thr, &st).e;
             }});
         Config cfg{R, W_HALF, t, TRIALS, 1234};
         write_csv_rows(std::cout, cfg, run_experiment(cfg, decs));
