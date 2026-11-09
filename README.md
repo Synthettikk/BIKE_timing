@@ -16,11 +16,11 @@ BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.
 | Circulant arithmetic in F₂[X]/(Xʳ − 1) (NTL) | done |
 | Bit-flip decoder (fixed or variable threshold) | done |
 | Black-Gray-Flip (BGF) decoder | done |
-| Experiment harness and decoder comparison | done ([report](docs/report.md)) |
+| Experiment harness and decoder comparison | done ([report](docs/decoder_comparison.md)) |
 | Randomness and hashing (OpenSSL) | done
 | KeyGen / Encaps / Decaps | done |
 | Unit tests | done |
-| Timing-leakage check with dudect | planned |
+| Timing-leakage check with dudect | partial ([report](docs/constant_time.md))|
 | Own GF(2)[X] arithmetic (replacing NTL) | planned |
 
 > This implementation is not constant-time, not bit-exact with the
@@ -36,7 +36,7 @@ BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.
 
 At BIKE's error weight (t = 134), BGF decodes all 100 samples with 26% fewer
 counters than bit-flipping with the same threshold function. Details, limits and
-reproduction steps are in [docs/report.md](docs/report.md).
+reproduction steps are in [docs/decoder_comparison.md](docs/decoder_comparison.md).
 
 ### Timing leakage (dudect)
 
@@ -85,12 +85,21 @@ cmake --build build        # compile everything
 
 Executables are written to `build/`.
 
-### Run
+### Run Experiments
 
+#### Decoder comparison
 ```bash
-./build/main                                   # demo
 ./build/exp_bit_flip > results/bitflip_v2.csv  # bit-flip experiment (CSV on stdout)
 ./build/exp_bgf      > results/bgf_v1.csv      # BGF experiment
+```
+
+#### Timing decaps (homemade)
+```bash
+# tests: fixed_vs_random, fixed_vs_fixed2, random_vs_random, valid_vs_bad_c0, valid_vs_bad_c1
+# usage: timing_decaps <test> <N> [raw_times.csv] > curve.csv
+for t in fixed_vs_random fixed_vs_fixed2 random_vs_random valid_vs_bad_c0 valid_vs_bad_c1; do
+  taskset -c 2 ./build/timing_decaps $t 10000 results/timing_${t}_times.csv > results/timing_${t}_curve.csv
+done
 ```
 
 The experiments take several minutes. Progress is printed on stderr, so the CSV stays clean.
@@ -105,10 +114,13 @@ ctest --test-dir build --output-on-failure
 
 ```bash
 sudo apt install python3-pandas python3-matplotlib
-python3 scripts/plot_results.py results/compare_v1.csv docs/figures
+# decoder comparison
+python3 scripts/plot_results.py results/compare_v1.csv docs/figures 
+# timing decaps
+python3 scripts/plot_timing.py        # writes docs/figures/timing_decaps.png
 ```
 
-See [docs/report.md](docs/report.md) for the analysis and how to reproduce it.
+See [docs/decoder_comparison.md](docs/decoder_comparison.md) for the analysis and how to reproduce it.
 
 ## Projet structure 
 
@@ -121,7 +133,7 @@ BIKE_timing/
 │   ├── figures/
 │   │   ├── compare_v1_cost.png
 │   │   └── compare_v1_failrate.png
-│   └── report.md
+│   └── decoder_comparison.md   # report
 ├── experiments/            #  decoder comparison etc
 │   ├── exp_bgf.cpp
 │   ├── exp_bit_flip.cpp

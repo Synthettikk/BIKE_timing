@@ -10,6 +10,7 @@ __pycache__/
 # plots written next to the CSVs by plot_results.py
 # (the figures used by the report are kept in docs/figures/)
 results/*.png
+results/timing_*_times.csv
 
 # editors and OS
 .vscode/

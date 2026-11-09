@@ -44,6 +44,9 @@ target_link_libraries(exp_bit_flip PRIVATE harness)
 add_executable(exp_bgf experiments/exp_bgf.cpp)
 target_link_libraries(exp_bgf PRIVATE harness)
 
+add_executable(timing_decaps experiments/timing_decaps.cpp)
+target_link_libraries(timing_decaps PRIVATE bike_lib)
+
 # --- unit tests (run with: ctest --test-dir build --output-on-failure) ---
 enable_testing()
 
