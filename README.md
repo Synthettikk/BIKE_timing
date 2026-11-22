@@ -27,19 +27,17 @@ BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.
 > memory and must not be used to protect real data.
 
 
-## Results 
+## Results in brief
 
-### Decoders comparison 
-
+- **Decoders** ([docs/decoder_comparison.md](docs/decoder_comparison.md)):
 ![Failure rate versus error weight](docs/figures/compare_v1_failrate.png)
-
 At BIKE's error weight (t = 134), BGF decodes all 100 samples with 26% fewer
 counters than bit-flipping with the same threshold function. Details, limits and
 reproduction steps are in [docs/decoder_comparison.md](docs/decoder_comparison.md).
-
-### Timing leakage (dudect)
-
-(In progress)
+- **Timing** ([docs/constant_time.md](docs/constant_time.md)): a decapsulation takes about 7 ms.
+  A failing decapsulation is about 1.3 ms (18 %) faster than a valid one, and the running time
+  also depends on the ciphertext. A home-made dudect-style test and the dudect library agree.
+- **Not fixed on purpose**: the leaks are measured and documented, not removed.
 
 ## Implementation notes
 
@@ -83,6 +81,49 @@ cmake --build build -j     # compile everything
 ```
 
 Executables are written to `build/`.
+
+### Demo 
+
+```bash
+./build/bike_demo --fixed
+```
+
+Runs the whole KEM (key generation, encapsulation, decapsulation with the decoder's statistics,
+implicit rejection, 20 round trips). With `--fixed` the seeds are fixed: everything except the
+timings is reproducible, so the output below is what you should see.
+
+```
+== Parameters (BIKE level 1) ==
+r = 12323, block weight d = 71 (w = 142), error weight t = 134, ell = 256 bits
+
+== KeyGen ==
+public key h: 1541 bytes, starts with 9709f8a60192d70b226f3475cd243a41...
+secret key: h0 and h1 of weight 71 and 71, sigma of 32 bytes (not printed)
+time: 12.6 ms
+
+== Encaps ==
+ciphertext: c0 = 1541 bytes, c1 = 32 bytes (total 1573)
+shared secret (encaps): 57fda8a3a25f65383ef9dd05de2574876f8f8f4fe44f3d6fac3ad97e020a2649
+time: 1.1 ms
+
+== Decaps ==
+syndrome s = c0 * h0: weight 4850 (out of 12323)
+BGF decoder (5 iterations, no early exit): success
+  syndrome reached 0 at iteration 2, final syndrome weight 0
+  counters computed: 123290
+  weight of the recovered error: 134 (t = 134)
+shared secret (decaps): 57fda8a3a25f65383ef9dd05de2574876f8f8f4fe44f3d6fac3ad97e020a2649
+keys match: yes
+time: 10.9 ms
+
+== Implicit rejection ==
+c1 modified:  key 1b833c932d67a699... (different, no error reported)
+c0 replaced:  key 3d43242ec7c59dbc... (different, no error reported)
+
+== Round trips with fresh randomness ==
+20/20 keys agree (0.2 s)
+A decoding failure is negligibly rare with these parameters; one here would point to a bug.
+```
 
 ### Run Experiments
 

@@ -29,9 +29,9 @@ target_include_directories(bike_lib PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(bike_lib PUBLIC ${NTL_LIB} gmp pthread m OpenSSL::Crypto)
 target_compile_options(bike_lib PUBLIC -Wall -Wextra)
 
-# --- main executable ---
-add_executable(main src/BIKE.cpp)
-target_link_libraries(main PRIVATE bike_lib)
+# --- bike_demo executable ---
+add_executable(bike_demo src/BIKE.cpp)
+target_link_libraries(bike_demo PRIVATE bike_lib)
 
 # --- experiments: generic harness + one program per experiment ---
 add_library(harness STATIC experiments/harness.cpp)
