@@ -1,0 +1,23 @@
+test valid_vs_bad_c0, batch = 500 measurements
+meas:    0.00 M, not enough measurements (9511 still to go).
+meas:    0.00 M, not enough measurements (9022 still to go).
+meas:    0.00 M, not enough measurements (8533 still to go).
+meas:    0.00 M, not enough measurements (8044 still to go).
+meas:    0.00 M, not enough measurements (7555 still to go).
+meas:    0.00 M, not enough measurements (7066 still to go).
+meas:    0.00 M, not enough measurements (6577 still to go).
+meas:    0.00 M, not enough measurements (6088 still to go).
+meas:    0.00 M, not enough measurements (5599 still to go).
+meas:    0.00 M, not enough measurements (5110 still to go).
+meas:    0.01 M, not enough measurements (4621 still to go).
+meas:    0.01 M, not enough measurements (4132 still to go).
+meas:    0.01 M, not enough measurements (3643 still to go).
+meas:    0.01 M, not enough measurements (3154 still to go).
+meas:    0.01 M, not enough measurements (2665 still to go).
+meas:    0.01 M, not enough measurements (2176 still to go).
+meas:    0.01 M, not enough measurements (1687 still to go).
+meas:    0.01 M, not enough measurements (1198 still to go).
+meas:    0.01 M, not enough measurements (709 still to go).
+meas:    0.01 M, not enough measurements (220 still to go).
+meas:    0.01 M, max t: +299.87, max tau: 2.96e+00, (5/tau)^2: 2.85e+00. Probably not constant time.
+result: leakage found

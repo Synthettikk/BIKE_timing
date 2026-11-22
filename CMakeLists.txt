@@ -56,6 +56,13 @@ function(add_unit_test name)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
+# dudect uses rdtsc: x86 only
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
+    add_executable(dudect_decaps experiments/dudect_decaps.cpp)
+    target_include_directories(dudect_decaps SYSTEM PRIVATE third_party/dudect)
+    target_link_libraries(dudect_decaps PRIVATE bike_lib)
+endif()
+
 add_unit_test(test_crypto_rng)
 add_unit_test(test_decoder)
 add_unit_test(test_kem)

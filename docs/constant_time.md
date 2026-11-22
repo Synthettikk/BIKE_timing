@@ -152,7 +152,42 @@ Reading:
   check fails) gives `|t| = 1.0`. Nothing was detected; this does not show that
   `operator==` is constant-time, only that its effect is below what 10000 measurements resolve.
 
-### 5.1 With dudect 
+### 5.2 With the dudect library
+
+The same question with the reference tool: `dudect.h` (Reparaz, Balasch, Verbauwhede; public
+domain) is vendored in `third_party/dudect/`, and `experiments/dudect_decaps.cpp` plugs `decaps`
+into it. dudect times the call with the x86 cycle counter, and for each batch of 500 measurements
+the class of every input is drawn at random. All inputs are built outside the timed region (each
+input chunk holds only the index of a ready ciphertext, so deserialization is not measured). The
+statistic is the largest |t| over 102 tests: all measurements, 100 cropped versions, and a
+second-order test. dudect gives no verdict before 10000 measurements; it answers "probably not
+constant time" above |t| = 10 and "definitely" above 500. The program stops at the first leak, or
+after 200 batches. Same conditions as 5.1 (Release, one pinned core, idle machine), one run each.
+
+| Test | Measurements | max t | max tau | (5/tau)^2 | dudect verdict | Homemade t (N = 10000) | Homemade tau = t/sqrt(N) |
+|------|--------------|-------|---------|-----------|----------------|------------------------|--------------------------|
+| `random_vs_random` (control) | 100000, no stop | +2.28 (largest over the run: 3.55) | 1.1e-2 | 2.0e5 | no leakage evidence | 0.81 | 0.008 |
+| `fixed_vs_random` | about 10000, stopped | +14.87 | 1.5e-1 | 1.2e3 | probably not constant time | -36.0 | 0.36 |
+| `valid_vs_bad_c0` | about 10000, stopped | +299.87 | 2.96 | 2.9 | probably not constant time | 428.3 | 4.28 |
+
+Reading:
+
+- **The two tools agree on every test.** The control does not reach |t| = 4.5 in 100000
+  measurements, and tau decreases roughly like 1/sqrt(n) (2.4e-2 to 1.1e-2), which is what the
+  absence of a difference looks like. For a real leak tau stays constant and t grows like sqrt(n).
+- **Decoding failure** (`valid_vs_bad_c0`): the leak of item 1 is found at the first verdict. The
+  two tools give the same order of magnitude for tau (2.96 and 4.28); they do not measure exactly
+  the same thing (cycles against nanoseconds, a different key, the largest of 102 tests).
+- **Dependence on the ciphertext** (`fixed_vs_random`): detected at the first verdict too, with a
+  smaller effect. The sign is opposite to 5.1 (+14.9 here, -36.0 there) because each run draws a new
+  key and a new fixed ciphertext: the test shows that the running time depends on the ciphertext, not
+  that a given one is slower. This matches `fixed_vs_fixed2` in 5.1.
+- **Limits.** `valid_vs_bad_c1` (item 10) and `fixed_vs_fixed2` were not run with dudect. Since the
+  program stops at the first verdict, the t values of the two leaking tests are those at about
+  10000 measurements, not a limit. With n measurements an effect is only detectable if tau is above
+  about 5/sqrt(n): 0.05 at n = 10000, 0.016 at n = 100000.
+- **Method note.** A test that finds nothing proves nothing: the control is the only one that was
+  expected to find nothing, and the leaking tests are the only ones whose conclusion is positive.
 
 
 ## 6. Mitigation roadmap

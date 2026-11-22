@@ -80,7 +80,7 @@ git clone https://github.com/Synthettikk/BIKE_timing
 cd BIKE_timing
 
 cmake -S . -B build        # configure (creates build/, Release mode by default)
-cmake --build build        # compile everything
+cmake --build build -j     # compile everything
 ```
 
 Executables are written to `build/`.
@@ -101,6 +101,23 @@ for t in fixed_vs_random fixed_vs_fixed2 random_vs_random valid_vs_bad_c0 valid_
   taskset -c 2 ./build/timing_decaps $t 10000 results/timing_${t}_times.csv > results/timing_${t}_curve.csv
 done
 ```
+
+#### Timing decaps with dudect
+The same question with the reference library [dudect](https://github.com/oreparaz/dudect)
+(vendored in `third_party/dudect/`, public domain). x86 Linux only: it reads the cycle counter.
+
+```bash
+# tests: fixed_vs_random, valid_vs_bad_c0, random_vs_random
+# usage: dudect_decaps <test> [max number of batches of 500 measurements]
+for t in fixed_vs_random valid_vs_bad_c0 random_vs_random; do
+  taskset -c 2 ./build/dudect_decaps $t 200 | tee results/dudect_${t}.txt
+done
+```
+
+It stops at the first leak (`|t| > 10`) or after the given number of batches. Each run draws a
+new key, so the sign and size of `t` in `fixed_vs_random` vary from run to run. For clean
+measurements pin the process to one core, keep the machine idle, and run one test at a time.
+Results and discussion: [docs/constant_time.md](docs/constant_time.md).
 
 The experiments take several minutes. Progress is printed on stderr, so the CSV stays clean.
 
@@ -135,10 +152,12 @@ BIKE_timing/
 │   │   └── compare_v1_failrate.png
 │   └── decoder_comparison.md   # report
 ├── experiments/            #  decoder comparison etc
+│   ├── dudect_decaps.cpp
 │   ├── exp_bgf.cpp
 │   ├── exp_bit_flip.cpp
 │   ├── harness.cpp
-│   └── harness.h
+│   ├── harness.h
+│   └── timing_decaps.cpp  
 ├── include/
 │   ├── crypto_rng.h        # os rng, hash functions, etc (openSSL)
 │   ├── decoder.h           # bit_flip, bgf_decoder, threshold functions
@@ -149,9 +168,11 @@ BIKE_timing/
 │   ├── bgf_v1.csv
 │   ├── bitflip_v1.csv
 │   ├── bitflip_v2.csv
-│   └── compare_v1.csv
+│   ├── compare_v1.csv
+│   └── timing_*
 ├── scripts/
-│   └── plot_results.py     # CSV -> PNG
+│   ├── plot_results.py     # CSV -> PNG
+│   └── plot_timing.py
 ├── src/
 │   ├── BIKE.cpp            #   main()
 │   ├── crypto_rng.cpp 
@@ -164,6 +185,8 @@ BIKE_timing/
 │   ├── test_decoder.cpp 
 │   ├── test_kem.cpp 
 │   └── test_tils.cpp
+├── tests/dudect/
+│   └── dudect.h
 ├── .gitignore
 ├── CMakeLists.txt
 ├── LICENSE

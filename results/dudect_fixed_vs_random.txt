@@ -1,0 +1,23 @@
+test fixed_vs_random, batch = 500 measurements
+meas:    0.00 M, not enough measurements (9511 still to go).
+meas:    0.00 M, not enough measurements (9022 still to go).
+meas:    0.00 M, not enough measurements (8533 still to go).
+meas:    0.00 M, not enough measurements (8044 still to go).
+meas:    0.00 M, not enough measurements (7555 still to go).
+meas:    0.00 M, not enough measurements (7066 still to go).
+meas:    0.00 M, not enough measurements (6577 still to go).
+meas:    0.00 M, not enough measurements (6088 still to go).
+meas:    0.00 M, not enough measurements (5599 still to go).
+meas:    0.00 M, not enough measurements (5110 still to go).
+meas:    0.01 M, not enough measurements (4621 still to go).
+meas:    0.01 M, not enough measurements (4132 still to go).
+meas:    0.01 M, not enough measurements (3643 still to go).
+meas:    0.01 M, not enough measurements (3154 still to go).
+meas:    0.01 M, not enough measurements (2665 still to go).
+meas:    0.01 M, not enough measurements (2176 still to go).
+meas:    0.01 M, not enough measurements (1687 still to go).
+meas:    0.01 M, not enough measurements (1198 still to go).
+meas:    0.01 M, not enough measurements (709 still to go).
+meas:    0.01 M, not enough measurements (220 still to go).
+meas:    0.01 M, max t:  +14.87, max tau: 1.47e-01, (5/tau)^2: 1.16e+03. Probably not constant time.
+result: leakage found
