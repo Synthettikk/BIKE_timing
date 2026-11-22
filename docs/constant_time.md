@@ -2,8 +2,11 @@
 
 This implementation is **not constant-time**. It is educational code, and it says so on purpose.
 This document lists, function by function, where execution time or memory access depends on
-secret data, how serious each case is, and what a fix would look like. Measurements with
-[dudect](https://github.com/oreparaz/dudect)-style tests are added in section 5 as they are made.
+secret data, how serious each case is, and what a fix would look like. Measurements (section 5, using [dudect](https://github.com/oreparaz/dudect) library) show a clear timing dependence of `decaps` on the ciphertext. No
+mitigation is implemented: making this code constant-time would need its own arithmetic instead
+of NTL and a rewrite of the decoder. Section 6
+lists what would be done.
+
 
 ## 1. Scope and threat model
 
@@ -43,10 +46,15 @@ Severity: **High** = leaks key material or the shared secret in a way known atta
 
 ### 3.1 `decaps` (items 1, 2, 10)
 
-On failure of the decoder, `decaps` does not compute `m'`, `L(e')` or `H(m')`, so a failed
-decapsulation is *faster* than a successful one. This is exactly the information that implicit
-rejection is designed to hide. For BIKE, whether decoding fails depends on the secret key, and
-adaptive attacks that exploit decoding failures are known (Guo, Johansson, Stankovski, 2016).
+The running time of `decaps` reveals whether decoding succeeded. The decoder always runs the
+same number of iterations, but the work inside an iteration depends on the data: on a random
+syndrome almost no counter reaches the threshold, so almost nothing is flipped and `e` stays
+zero, while a valid ciphertext flips many bits and needs full-size multiplications `H*e`. On
+failure `decaps` also skips `to_bytes`, `hash_L` and `hash_H`. The relative weight of these causes
+was not measured: the decoder is the likely main one, the skipped hashing is estimated to be
+smaller. In every case the observable is the same, and it is what implicit rejection is meant to
+hide. For BIKE, adaptive attacks that exploit decoding failures are known (Guo, Johansson,
+Stankovski, 2016).
 A constant-time version computes `m'`, `H(m')` and the comparison on every call, using a
 dummy value when decoding failed, and selects the key with a mask instead of `?:`.
 
@@ -141,10 +149,11 @@ Reading:
 
 - **Control**: two classes of fresh valid ciphertexts give `|t| < 1`, so the harness does not
   produce false positives.
-- **Decoding failure is visible** (item 1): a failed decapsulation is 1.3 ms (18 %) faster,
-  `t = 428`. The size of `t` grows like sqrt(N), as expected for a real difference. This test does
-  not separate the skipped hashes from the different behaviour of the decoder on a random
-  syndrome (items 3 and 5).
+- **Decoding failure is visible** (items 1, 3, 5): a failed decapsulation is 1.3 ms (18 %)
+  faster, `t = 428`. `t` grows like sqrt(N), as expected for a real difference. The cause was not
+  isolated. The decoder always runs the same number of iterations, but on a random syndrome
+  almost nothing is flipped, so its work differs; the hashing skipped on failure also contributes
+  to some extent. Which part dominates was not measured.
 - **The running time depends on the ciphertext** (items 3, 5, 7, 11): two different valid
   ciphertexts, each repeated (so equally warm in the cache), differ by about 24 µs (0.3 %),
   `|t| = 22`. The cause is not identified. Isolating the decoder and `hash_H` is the next step.
@@ -190,19 +199,21 @@ Reading:
   expected to find nothing, and the leaking tests are the only ones whose conclusion is positive.
 
 
-## 6. Mitigation roadmap
+## 6. Possible mitigations (not implemented)
 
-Ordered by effort for the gain:
+None of the following has been done. They are listed in order of effort for the gain, and the
+first one would not be enough on its own (see 3.1):
 
-1. Compute `m'`, `H(m')` and the comparison on every call; select the key with a mask
-   (items 1, 2, 10). Small change, removes the most documented leak.
-2. Full-length comparison for `operator==`, branchless `to_bytes` (items 9, 10).
-3. Branchless thresholding in the decoder (item 3).
+1. Constant-time decoder: work on a plain bit array for `e`, apply the threshold with masks, and
+   convert to `GF2E` only at the end (items 3, 5). The largest part of the measured gap.
+2. Compute `m'`, `H(m')` and the comparison on every call; select the key with a mask
+   (items 1, 2, 10).
+3. Full-length comparison for `operator==`, branchless `to_bytes` (items 9, 10).
 4. Own `GF(2)[X]` arithmetic with fixed-time multiplication and inversion (items 4, 6, 11),
    which also allows wiping secrets (item 12).
 5. Constant-time sampling (item 7).
 
-After each step, re-run section 5 and record the before / after values here.
+The measurements of section 5 can be repeated after any of these steps to record the effect.
 
 ## References
 

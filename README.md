@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml/badge.svg)](https://github.com/Synthettikk/BIKE_timing/actions/workflows/ci.yml)
 
-This project aims to implement the BIKE cryptosystem without constant time and to demonstrate the occurrence of a timing leak using dudect.
+This project aims to implement the BIKE cryptosystem without constant time and to demonstrate the occurrence of a timing leak using [dudect](https://github.com/oreparaz/dudect).
 BIKE is a postquantum code-based cryptostem that made it to the round 4 of the NIST standardization competition. 
-We also compare the Bit-Flipping algorithm and the Black-Gray-Flip decoder, and report an inventory of non constant functions that manipulate the secret. 
+We also compare the Bit-Flipping algorithm and the Black-Gray-Flip decoder, and report an inventory of non constant functions that manipulate the secret : [report](docs/constant_time.md). 
 
 The documentation we used can be found here : 
 BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.1.pdf> (threshold function, BGF parameters).
@@ -20,8 +20,7 @@ BIKE specification v4.2, <https://bikesuite.org/files/v4.2/BIKE_Spec.2021.07.26.
 | Randomness and hashing (OpenSSL) | done
 | KeyGen / Encaps / Decaps | done |
 | Unit tests | done |
-| Timing-leakage check with dudect | partial ([report](docs/constant_time.md))|
-| Own GF(2)[X] arithmetic (replacing NTL) | planned |
+| Timing-leakage check with dudect | done ([report](docs/constant_time.md))|
 
 > This implementation is not constant-time, not bit-exact with the
 > BIKE specification (no KAT), does not properly clear the secrets from the
@@ -185,7 +184,7 @@ BIKE_timing/
 │   ├── test_decoder.cpp 
 │   ├── test_kem.cpp 
 │   └── test_tils.cpp
-├── tests/dudect/
+├── third_party/dudect/
 │   └── dudect.h
 ├── .gitignore
 ├── CMakeLists.txt
